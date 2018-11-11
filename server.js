@@ -19,14 +19,13 @@ app.get('/events', (req, res) => {
       var projectI = db.db("easy-event");
 
       //await this to return a promise
-      let result_users = await projectI.collection("users").find({ name: "Tv" }).toArray();
+      let result_users = await projectI.collection("users").find({ name: "Aq" }).toArray();
       var query = { user_id: ObjectId(result_users[0]._id) };
 
       //print the result
-      projectI.collection("events").find(query).toArray(function (err, result) {
-        if (err) throw err;
-        res.json(result);
-      });
+      let result = await projectI.collection("events").find(query).toArray();
+      console.log(result[0].time.begin_date);
+      res.json(result)
 
       db.close();
     }
@@ -42,12 +41,12 @@ app.post('/QR', (req, res) => {
       } else {
         var projectI = db.db("easy-event");
         var req_id = req.body.QRcode;
+        var currentDate = new Date()
+        var DYM = currentDate.getDate() + '/' + (currentDate.getMonth()+1) + '/' + currentDate.getFullYear() + ', ';
+        var time = currentDate.toLocaleTimeString(currentDate);
 
         let result_from_id = await projectI.collection("guests").find({ _id: ObjectId(req_id) }).toArray();
 
-        console.log('request: ' + req.body.event_id)
-        console.log('result: ' + result_from_id[0].eventID)
-        
         if (result_from_id.length == 0) {
           res.json({ message: 'No guest ID in database.' })
         }
@@ -57,8 +56,9 @@ app.post('/QR', (req, res) => {
           }
           else {
             if (result_from_id[0].check_in.checked == false) {
-              await projectI.collection("guests").updateOne({ _id: ObjectId(req_id) }, { $set: { "check_in.checked": true } })
-              res.json({ message: 'Done.' })
+              await projectI.collection("guests").updateOne({ _id: ObjectId(req_id) }, { $set: { "check_in.timestamp": DYM + time, "check_in.checked": true } })
+              // await projectI.collection("guests").updateOne({ _id: ObjectId(req_id) }, { $set: { "check_in.timestamp": DYM + time } })
+              res.json({ message: 'Done.', time: DYM + time, name: result_from_id[0].name })
             }
             else {
               res.json({ message: 'Guest ID already checked.' })
