@@ -14,13 +14,13 @@ app.get('/events', (req, res) => {
   MongoClient.connect(url, { useNewUrlParser: true }, async function (err, db) {
     if (err) {
       res.status(400);
-      res.json({message: 'Unable to connect to the mongoDB server. Error:', err});
+      res.json({ message: 'Unable to connect to the mongoDB server. Error:', err });
     } else {
       var projectI = db.db("easy-event");
 
       //await this to return a promise
-      let result_users = await projectI.collection("users").find({name: "Aq"}).toArray();
-      var query = {user_id: ObjectId(result_users[0]._id)};
+      let result_users = await projectI.collection("users").find({ name: "Tv" }).toArray();
+      var query = { user_id: ObjectId(result_users[0]._id) };
 
       //print the result
       projectI.collection("events").find(query).toArray(function (err, result) {
@@ -33,27 +33,36 @@ app.get('/events', (req, res) => {
   });
 });
 
-app.post('/QR', (req,res) => {
+app.post('/QR', (req, res) => {
   if (req.method == 'POST') {
     MongoClient.connect(url, { useNewUrlParser: true }, async function (err, db) {
       if (err) {
         res.status(400);
-        res.json({message: 'Unable to connect to the mongoDB server. Error:', err});
+        res.json({ message: 'Unable to connect to the mongoDB server. Error:', err });
       } else {
         var projectI = db.db("easy-event");
         var req_id = req.body.QRcode;
 
-        let result_from_id = await projectI.collection("guests").find({_id: ObjectId(req_id)}).toArray();
+        let result_from_id = await projectI.collection("guests").find({ _id: ObjectId(req_id) }).toArray();
+
+        console.log('request: ' + req.body.event_id)
+        console.log('result: ' + result_from_id[0].eventID)
+        
         if (result_from_id.length == 0) {
-          res.json({message: 'No guest ID in database.'})
+          res.json({ message: 'No guest ID in database.' })
         }
         else {
-          if (result_from_id[0].check_in.checked == false) {
-            await projectI.collection("guests").updateOne({_id: ObjectId(req_id)}, {$set: {"check_in.checked": true}})
-            res.json({message: 'Done.'})
+          if (result_from_id[0].eventID != req.body.event_id) {
+            res.json({ message: 'No guest ID in database.' })
           }
           else {
-            res.json({message: 'Guest ID already checked.'})
+            if (result_from_id[0].check_in.checked == false) {
+              await projectI.collection("guests").updateOne({ _id: ObjectId(req_id) }, { $set: { "check_in.checked": true } })
+              res.json({ message: 'Done.' })
+            }
+            else {
+              res.json({ message: 'Guest ID already checked.' })
+            }
           }
         }
       }
