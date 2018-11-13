@@ -19,7 +19,7 @@ app.get('/events', (req, res) => {
       var projectI = db.db("easy-event");
 
       //await this to return a promise
-      let result_users = await projectI.collection("users").find({ name: "Aq" }).toArray();
+      let result_users = await projectI.collection("users").find({ name: "Th" }).toArray();
       var query = { user_id: ObjectId(result_users[0]._id) };
 
       //print the result
