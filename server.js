@@ -10,7 +10,7 @@ var url = 'mongodb://admin123:admin123@ds131942.mlab.com:31942/easy-event';
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.get('/events', (req, res) => {
+app.post('/users', (req, res) => {
   MongoClient.connect(url, { useNewUrlParser: true }, async function (err, db) {
     if (err) {
       res.status(400);
@@ -19,7 +19,35 @@ app.get('/events', (req, res) => {
       var projectI = db.db("easy-event");
 
       //await this to return a promise
-      let result_users = await projectI.collection("users").find({ name: "Th" }).toArray();
+      let result_from_users = await projectI.collection("users").find({ name: req.body.name }).toArray();
+      
+      if (result_from_users.length == 0) {
+        res.json({message: "not OK"})
+      }
+      else {
+        if (result_from_users[0].password == req.body.password) {
+          res.json({message: "OK", user_id: result_from_users[0]._id})
+        }
+        else {
+          res.json({message: "not OK"})
+        }
+      }
+
+      db.close();
+    }
+  });
+});
+
+app.post('/events', (req, res) => {
+  MongoClient.connect(url, { useNewUrlParser: true }, async function (err, db) {
+    if (err) {
+      res.status(400);
+      res.json({ message: 'Unable to connect to the mongoDB server. Error:', err });
+    } else {
+      var projectI = db.db("easy-event");
+
+      //await this to return a promise
+      let result_users = await projectI.collection("users").find({ _id: ObjectId(req.body.user_id) }).toArray();
       var query = { user_id: ObjectId(result_users[0]._id) };
 
       //print the result
