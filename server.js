@@ -20,7 +20,7 @@ app.post('/users', (req, res) => {
 
       //await this to return a promise
       let result_from_users = await projectI.collection("users").find({ name: req.body.name }).toArray();
-      
+      console.log(req.body);
       if (result_from_users.length == 0) {
         res.json({message: "not OK"})
       }
@@ -48,12 +48,37 @@ app.post('/events', (req, res) => {
 
       //await this to return a promise
       let result_users = await projectI.collection("users").find({ _id: ObjectId(req.body.user_id) }).toArray();
+
       var query = { user_id: ObjectId(result_users[0]._id) };
 
       //print the result
       let result = await projectI.collection("events").find(query).toArray();
       console.log(result[0].time.begin_date);
       res.json(result)
+
+      db.close();
+    }
+  });
+});
+
+app.put('/events', (req, res) => {
+  MongoClient.connect(url, { useNewUrlParser: true }, async function (err, db) {
+    if (err) {
+      res.status(400);
+      res.json({ message: 'Unable to connect to the mongoDB server. Error:', err });
+    } else {
+      var projectI = db.db("easy-event");
+
+      let result = await projectI.collection("events").find({ user_id: ObjectId(req.body.user_id) ,name: {$regex: '^(?i)' + req.body.key_word} }).toArray();
+      console.log(req.body.key_word)
+      console.log(result)
+
+      if (result.length === 0) {
+        res.json({message: "not OK"});
+      }
+      else {
+        res.json({message: "OK", result: result});
+      }
 
       db.close();
     }
