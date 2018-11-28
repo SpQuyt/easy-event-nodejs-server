@@ -18,6 +18,7 @@ MongoClient.connect(url, { useNewUrlParser: true }, function(err, database) {
   console.log("Database OK");
 });
 
+//load all events without param "user"
 app.get('/events', (req, res) => {
   db.collection("events").find().toArray()
   .then(result => {
@@ -26,6 +27,7 @@ app.get('/events', (req, res) => {
   .catch(err => {res.json({message: err})})
 })
 
+//load events in Home screen with param "user"
 app.post('/events', (req, res) => {
   db.collection("users").find({ _id: ObjectId(req.body.user_id) }).toArray()
   .then(result_1 => {
@@ -40,6 +42,22 @@ app.post('/events', (req, res) => {
   .catch(err => {res.json({message: err})})
 });
 
+//list guests of event
+app.post('/guests', (req, res) => {
+  console.log(req.body.event_id)
+  db.collection("guests").find({eventID: ObjectId(req.body.event_id)}).toArray()
+  .then(result => {
+    if (result.length == 0) {
+      res.json({message: "not OK"})
+    }
+    else {
+      res.json({message: "OK", result: result})
+    }   
+  })
+  .catch(err => {res.json({message: err})})
+})
+
+//search events
 app.put('/events', (req, res) => {
   db.collection("events").find({
     user_id: ObjectId(req.body.user_id),
@@ -56,6 +74,7 @@ app.put('/events', (req, res) => {
   .catch(err => {res.json({message: err})})
 });
 
+//login API
 app.post('/users', (req, res) => {
   db.collection("users").find({ name: req.body.name }).toArray()
   .then(result => {
@@ -74,6 +93,7 @@ app.post('/users', (req, res) => {
   .catch(err => {res.json({message: err})})
 });
 
+//check QR code
 app.post('/QR', (req, res) => {
   const req_id = req.body.QRcode;
   const currentDate = new Date();
