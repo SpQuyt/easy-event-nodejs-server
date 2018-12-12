@@ -44,9 +44,9 @@ app.post('/events', (req, res) => {
 
 //list guests of event
 app.post('/guests', (req, res) => {
-  console.log(req.body.event_id)
   db.collection("guests").find({eventID: ObjectId(req.body.event_id)}).toArray()
   .then(result => {
+    console.log(result)
     if (result.length == 0) {
       res.json({message: "not OK"})
     }
