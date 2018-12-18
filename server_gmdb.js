@@ -73,6 +73,7 @@ class Crawler {
         })
       }
     }
+    console.log(cine_list)
     return cine_list;
   }
 }
@@ -114,6 +115,9 @@ class Cinema {
                   result_after.push(result[i])
                 }
               }
+              return result_after;
+            })
+            .then (result_after => {
               if (result_after.length != 0) {
                 suggest_list.push({
                   id: nearest_cinemas[i].id,
@@ -137,9 +141,10 @@ class Cinema {
   }
 }
 
-// var crawler = new Crawler()
+var crawler = new Crawler()
 // crawler.crawlCineFromMovie(15184,2018-12-16)
 var cinema = new Cinema()
-cinema.suggestShowTime(21.0447802, 105.7839336, 15184, 2018 - 12 - 16)
+// cinema.suggestShowTime(21.0447802, 105.7839336, 15184, 2018 - 12 - 19)
+crawler.crawlCineFromMovie(15184, 2018 - 12 - 18)
 
 app.listen(port, () => console.log("Easy Event listening on port", port));
