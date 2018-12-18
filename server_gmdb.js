@@ -73,7 +73,7 @@ class Crawler {
         })
       }
     }
-    console.log(cine_list)
+    // console.log(cine_list)
     return cine_list;
   }
 }
@@ -142,9 +142,9 @@ class Cinema {
 }
 
 var crawler = new Crawler()
-// crawler.crawlCineFromMovie(15184,2018-12-16)
+// crawler.crawlCineFromMovie(15184,'2018-12-16')
 var cinema = new Cinema()
-// cinema.suggestShowTime(21.0447802, 105.7839336, 15184, 2018 - 12 - 19)
-crawler.crawlCineFromMovie(15184, 2018 - 12 - 18)
+cinema.suggestShowTime(21.0447802, 105.7839336, 15184, '2018-12-21')
+// crawler.crawlCineFromMovie(15184, 2018 - 12 - 18)
 
 app.listen(port, () => console.log("Easy Event listening on port", port));
