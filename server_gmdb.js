@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const port = 3005;
 const bodyParser = require('body-parser');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
 
 const https = require("superagent");
 const DomParser = require('dom-parser');
@@ -76,6 +78,26 @@ class Crawler {
     // console.log(cine_list)
     return cine_list;
   }
+
+  async crawlMoveekId() {
+    const res = await https.get("https://moveek.com/lich-chieu/")
+    const ele = parser.parseFromString(res.text, "text/html");
+    const dom = new JSDOM(ele.rawHTML);
+    var movie_list = [];
+    let count = 0
+    while(1) {
+      if (dom.window.document.getElementsByTagName('select')[0][count] == undefined) {
+        break;
+      }
+      movie_list.push({
+        moveek_id: dom.window.document.getElementsByTagName('select')[0][count].getAttribute('value'),
+        name: dom.window.document.getElementsByTagName('select')[0][count].innerHTML
+      })
+      count= count+1;
+    }
+    console.log(movie_list)
+    return movie_list;
+  }
 }
 
 class Cinema {
@@ -117,7 +139,7 @@ class Cinema {
               }
               return result_after;
             })
-            .then (result_after => {
+            .then(result_after => {
               if (result_after.length != 0) {
                 suggest_list.push({
                   id: nearest_cinemas[i].id,
@@ -144,7 +166,8 @@ class Cinema {
 var crawler = new Crawler()
 // crawler.crawlCineFromMovie(15184,'2018-12-16')
 var cinema = new Cinema()
-cinema.suggestShowTime(21.0447802, 105.7839336, 15184, '2018-12-21')
+crawler.crawlMoveekId()
+// cinema.suggestShowTime(21.0447802, 105.7839336, 15184, '2018-12-21')
 // crawler.crawlCineFromMovie(15184, 2018 - 12 - 18)
 
 app.listen(port, () => console.log("Easy Event listening on port", port));
