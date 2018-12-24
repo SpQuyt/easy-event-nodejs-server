@@ -172,6 +172,7 @@ class Crawler {
       //conditions of ACTORS when crawl
       if (dom.window.document.getElementsByClassName('movie-actors panel wrapper m-t')[0] === undefined) {
         actors = null;
+        actors_after = [].toString();
       }
       else {
         actors_length = dom.window.document.getElementsByClassName('movie-actors panel wrapper m-t')[0].getElementsByClassName('col-xs-3 col-sm-2 block-actor').length;
